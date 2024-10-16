@@ -101,6 +101,15 @@ class _UserProfileState extends State<UserProfile> {
           'timestamp': FieldValue.serverTimestamp(),
           'userID': currentUserID.currentUser!.uid
         });
+
+        await FirebaseFirestore.instance
+            .collection('notification')
+            .doc(widget.userID)
+            .collection('notif')
+            .add({
+          'timestamp': FieldValue.serverTimestamp(),
+          'userID': currentUserID.currentUser!.uid
+        });
         _checkFollowStatus();
       }
       _getFollowerCount();
@@ -252,6 +261,12 @@ class _UserProfileState extends State<UserProfile> {
                       ],
                     ),
                     const SizedBox(height: 20),
+                    SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        child: TabBarWidget(
+                          ownuserpostid: widget.userID,
+                        ))
                     // SizedBox(
                     //     width: MediaQuery.of(context).size.width,
                     //     height: MediaQuery.of(context).size.height * 0.60,

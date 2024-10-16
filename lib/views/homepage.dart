@@ -72,13 +72,18 @@ class _HomepageState extends State<Homepage> {
         ],
       ),
       body: userData != null
-          ? SingleChildScrollView(
-              child: Column(
-                children: [
-                  UsersPostFeed(
-                    userData: userData,
-                  )
-                ],
+          ? RefreshIndicator(
+              onRefresh: () async {
+                setState(() {});
+              },
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    UsersPostFeed(
+                      userData: userData,
+                    )
+                  ],
+                ),
               ),
             )
           : const LinearProgressIndicator(),

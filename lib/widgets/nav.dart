@@ -1,4 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:social/controller/loginForm.dart';
+import 'package:social/views/chat.dart';
+import 'package:social/views/following.dart';
+import 'package:social/views/notif.dart';
+import 'package:social/views/profile.dart';
 
 class DrawerFb1 extends StatelessWidget {
   const DrawerFb1({super.key});
@@ -16,40 +22,48 @@ class DrawerFb1 extends StatelessWidget {
                 children: [
                   const SizedBox(height: 12),
                   MenuItem(
-                    text: 'Friends',
+                    text: 'Following',
                     icon: Icons.people,
                     onClicked: () => selectedItem(context, 0),
                   ),
                   const SizedBox(height: 5),
                   MenuItem(
-                    text: 'Liked Photos',
-                    icon: Icons.favorite_border,
+                    text: 'Profile',
+                    icon: Icons.person_outline,
                     onClicked: () => selectedItem(context, 1),
                   ),
                   const SizedBox(height: 5),
                   MenuItem(
-                    text: 'Workflow',
+                    text: 'Messages',
                     icon: Icons.workspaces_outline,
                     onClicked: () => selectedItem(context, 2),
                   ),
                   const SizedBox(height: 5),
-                  MenuItem(
-                    text: 'Updates',
-                    icon: Icons.update,
-                    onClicked: () => selectedItem(context, 3),
-                  ),
                   const SizedBox(height: 8),
                   const Divider(color: Colors.white70),
                   const SizedBox(height: 8),
                   MenuItem(
                     text: 'Notifications',
                     icon: Icons.notifications_outlined,
-                    onClicked: () => selectedItem(context, 5),
+                    onClicked: () => selectedItem(context, 3),
                   ),
                   MenuItem(
                     text: 'Settings',
                     icon: Icons.settings,
                     onClicked: () => selectedItem(context, 6),
+                  ),
+                  MenuItem(
+                    text: 'Logout',
+                    icon: Icons.logout_rounded,
+                    onClicked: () async {
+                      await FirebaseAuth.instance.signOut().then((uid) {
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginForm()),
+                            (Route<dynamic> route) => false);
+                      });
+                    },
                   ),
                 ],
               ),
@@ -65,12 +79,24 @@ class DrawerFb1 extends StatelessWidget {
     switch (index) {
       case 0:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const Scaffold(), // Page 1
+          builder: (context) => const ShowFollowing(), // Page 1
         ));
         break;
       case 1:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const Scaffold(), // Page 2
+          builder: (context) => UserProfile(
+            userID: FirebaseAuth.instance.currentUser!.uid,
+          ), // Page 2
+        ));
+        break;
+      case 2:
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const ChatSystem(), // Page 2
+        ));
+        break;
+      case 3:
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const ShowNotification(), // Page 2
         ));
         break;
     }

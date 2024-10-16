@@ -1,113 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:social/widgets/ownpost.dart';
+import 'package:social/widgets/repost.dart';
 
-class TabPair {
-  final Tab tab;
-  final Widget view;
-  TabPair({required this.tab, required this.view});
-}
-
-List<TabPair> TabPairs = [
-  TabPair(
-    tab: const Tab(
-      text: 'Intro',
-    ),
-    view: const Center(
-      child: Text(
-        'Intro here',
-        style: TextStyle(
-          fontSize: 25,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    ),
-  ),
-  TabPair(
-    tab: const Tab(
-      text: 'Ingredients',
-    ),
-    view: const Center(
-      // replace with your own widget here
-      child: Text(
-        'Ingredients here',
-        style: TextStyle(
-          fontSize: 25,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    ),
-  ),
-  TabPair(
-    tab: const Tab(
-      text: 'Steps',
-    ),
-    view: const Center(
-      child: Text(
-        'Steps here',
-        style: TextStyle(
-          fontSize: 25,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    ),
-  )
-];
-
-class TabBarAndTabViews extends StatefulWidget {
-  const TabBarAndTabViews({super.key});
-
-  @override
-  _TabBarAndTabViewsState createState() => _TabBarAndTabViewsState();
-}
-
-class _TabBarAndTabViewsState extends State<TabBarAndTabViews>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    _tabController = TabController(length: TabPairs.length, vsync: this);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _tabController.dispose();
-  }
+class TabBarWidget extends StatelessWidget {
+  final String ownuserpostid;
+  const TabBarWidget({super.key, required this.ownuserpostid});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
+    return DefaultTabController(
+      length: 2,
       child: Column(
         children: [
-          Container(
-            height: 45,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(
-                25.0,
+          const TabBar(
+            tabs: [
+              Tab(
+                icon: Icon(Icons.photo_outlined),
               ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(6),
-              child: TabBar(
-                  controller: _tabController,
-                  // give the indicator a decoration (color and border radius)
-                  indicator: BoxDecoration(
-                    borderRadius: BorderRadius.circular(
-                      25.0,
-                    ),
-                    color: Color(0xFFFF8527),
-                  ),
-                  labelColor: Colors.white,
-                  unselectedLabelColor: Colors.black,
-                  tabs: TabPairs.map((tabPair) => tabPair.tab).toList()),
+              Tab(
+                icon: Icon(Icons.autorenew_outlined),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          // Wrap TabBarView with Expanded
+          Expanded(
+            child: TabBarView(
+              children: [
+                OwnUsersPostFeed(
+                  ownpostID: ownuserpostid,
+                ),
+                OwnReposted(
+                  ownpostID: ownuserpostid,
+                ),
+              ],
             ),
           ),
-          TabBarView(
-              controller: _tabController,
-              children: TabPairs.map((tabPair) => tabPair.view).toList()),
         ],
       ),
     );

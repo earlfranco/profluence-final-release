@@ -300,6 +300,9 @@ class _SignUpFormState extends State<SignUpForm> {
             'schoolId': _schoolIdController.text,
             'profileImage': imageUrl,
             'userid': user.uid,
+          }).then((uid) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const LoginForm()));
           });
 
           debugPrint("Account created successfully!");
