@@ -1,3 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social/controller/loginForm.dart';
@@ -56,12 +59,23 @@ class DrawerFb1 extends StatelessWidget {
                     text: 'Logout',
                     icon: Icons.logout_rounded,
                     onClicked: () async {
-                      await FirebaseAuth.instance.signOut().then((uid) {
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const LoginForm()),
-                            (Route<dynamic> route) => false);
+                      final currentuser = FirebaseAuth.instance.currentUser;
+                      await FirebaseFirestore.instance
+                          .collection('loginrecord')
+                          .doc(currentuser!.uid)
+                          .update({
+                        'name': currentuser.email,
+                        'userid': currentuser.email,
+                        'login': 0,
+                        'logout': Timestamp.now(),
+                      }).then((uid) {
+                        FirebaseAuth.instance.signOut().then((uid) {
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginForm()),
+                              (Route<dynamic> route) => false);
+                        });
                       });
                     },
                   ),

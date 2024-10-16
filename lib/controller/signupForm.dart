@@ -1,4 +1,4 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, use_build_context_synchronously
 
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -272,10 +272,22 @@ class _SignUpFormState extends State<SignUpForm> {
     }
   }
 
+  Future<void> _dailysignup(String imageUrl, String uid) async {
+    FirebaseFirestore.instance.collection('users').add({
+      'name': _nameController.text,
+      'email': _emailController.text,
+      'schoolId': _schoolIdController.text,
+      'profileImage': imageUrl,
+      'userid': uid,
+      'timesignup': Timestamp.now(),
+    });
+  }
+
   Future<void> _submitForm() async {
     setState(() {
       islaod = true;
     });
+
     try {
       if (imagepic != null) {
         UserCredential userCredential = await FirebaseAuth.instance
@@ -300,6 +312,7 @@ class _SignUpFormState extends State<SignUpForm> {
             'name': _nameController.text,
             'email': _emailController.text,
             'schoolId': _schoolIdController.text,
+            'valid': 1,
             'profileImage': imageUrl,
             'userid': user.uid,
           }).then((uid) {
@@ -314,7 +327,7 @@ class _SignUpFormState extends State<SignUpForm> {
                   TextButton(
                     child: const Text("OK"),
                     onPressed: () {
-                      Navigator.of(context).pop(); // Close the dialog
+                      Navigator.of(context).pop();
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
@@ -325,24 +338,49 @@ class _SignUpFormState extends State<SignUpForm> {
               ),
             );
           });
-
+          await _dailysignup(imageUrl, user.uid);
           debugPrint("Account created successfully! Verification email sent.");
         }
-        setState(() {
-          islaod = false;
-        });
       } else {
-        debugPrint("Please upload a profile picture.");
-        setState(() {
-          islaod = false;
-        });
+        _showSnackBar("Please upload a profile picture.");
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        _showSnackBar("This email is already registered. Please log in.");
+      } else if (e.code == 'invalid-email') {
+        _showSnackBar("The email address is not valid.");
+      } else if (e.code == 'operation-not-allowed') {
+        _showSnackBar("Email/password accounts are not enabled.");
+      } else if (e.code == 'too-many-requests') {
+        _showSnackBar("Too many requests. Please try again later.");
+      } else {
+        _showSnackBar("An error occurred. Please try again.");
+      }
+    } on FirebaseException catch (e) {
+      if (e.code == 'unauthorized') {
+        _showSnackBar("You are not authorized to perform this action.");
+      } else if (e.code == 'cancelled') {
+        _showSnackBar("The operation was cancelled.");
+      } else {
+        _showSnackBar("Failed to upload image. Please try again.");
       }
     } catch (e) {
       debugPrint("Error: $e");
+      _showSnackBar("An unexpected error occurred.");
+    } finally {
       setState(() {
         islaod = false;
       });
     }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 
   @override

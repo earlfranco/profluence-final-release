@@ -1,7 +1,9 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, use_build_context_synchronously
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:social/controller/forgotpassword.dart';
 import 'package:social/controller/signupForm.dart';
 import 'package:social/utils/globaltheme.dart';
 import 'package:social/views/homepage.dart';
@@ -31,8 +33,7 @@ class _LoginFormState extends State<LoginForm> {
     return isload != true
         ? Scaffold(
             body: SingleChildScrollView(
-              child: Center(
-                  child: Form(
+              child: Form(
                 key: _formKey,
                 child: Column(
                   children: [
@@ -46,7 +47,7 @@ class _LoginFormState extends State<LoginForm> {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Row(
@@ -88,6 +89,7 @@ class _LoginFormState extends State<LoginForm> {
                     Padding(
                       padding: const EdgeInsets.all(18.0),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           TextFormField(
                             controller: _emailcont,
@@ -126,7 +128,23 @@ class _LoginFormState extends State<LoginForm> {
                             },
                           ),
                           const SizedBox(
-                            height: 30,
+                            height: 5,
+                          ),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const Forgotpasswordpage()));
+                              },
+                              child: const PrimaryText(
+                                falign: TextAlign.right,
+                                data: "Forgot password?",
+                                fcolor: secondColor,
+                              )),
+                          const SizedBox(
+                            height: 10,
                           ),
                           SizedBox(
                             width: MediaQuery.of(context).size.width,
@@ -142,24 +160,26 @@ class _LoginFormState extends State<LoginForm> {
                           const SizedBox(
                             height: 15,
                           ),
-                          TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const SignUpForm()));
-                              },
-                              child: const PrimaryText(
-                                data: "Dont have an account? Sign up",
-                                fcolor: secondColor,
-                              ))
+                          Center(
+                            child: TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const SignUpForm()));
+                                },
+                                child: const PrimaryText(
+                                  data: "Dont have an account? Sign up",
+                                  fcolor: secondColor,
+                                )),
+                          )
                         ],
                       ),
                     )
                   ],
                 ),
-              )),
+              ),
             ),
           )
         : const Scaffold(
@@ -179,9 +199,12 @@ class _LoginFormState extends State<LoginForm> {
     setState(() {
       isload = true;
     });
+
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: _emailcont.text, password: _passwordcont.text);
+        email: _emailcont.text,
+        password: _passwordcont.text,
+      );
 
       User? user = FirebaseAuth.instance.currentUser;
 
@@ -231,9 +254,46 @@ class _LoginFormState extends State<LoginForm> {
           MaterialPageRoute(builder: (context) => const Homepage()),
           (Route<dynamic> route) => false,
         );
+        await _dailylogin(user!.uid);
       }
-    } catch (error) {
-      debugPrint("$error");
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        isload = false;
+      });
+
+      if (!mounted) return;
+
+      String errorMessage = "An error occurred. Please try again.";
+      if (e.code == 'user-not-found') {
+        errorMessage = "No user found with this email.";
+      } else if (e.code == 'wrong-password') {
+        errorMessage = "Incorrect password.";
+      } else if (e.code == 'invalid-email') {
+        errorMessage = "The email address is invalid.";
+      } else if (e.code == 'user-disabled') {
+        errorMessage = "This account has been disabled.";
+      } else if (e.code == 'too-many-requests') {
+        errorMessage = "Too many login attempts. Try again later.";
+      }
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Login Error"),
+          content: Text(errorMessage),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (mounted) {
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
       setState(() {
         isload = false;
       });
@@ -243,8 +303,8 @@ class _LoginFormState extends State<LoginForm> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text("Login Error"),
-          content: Text(error.toString()),
+          title: const Text("Error"),
+          content: const Text("An unexpected error occurred."),
           actions: [
             TextButton(
               onPressed: () {
@@ -258,5 +318,26 @@ class _LoginFormState extends State<LoginForm> {
         ),
       );
     }
+  }
+
+  Future<void> _dailylogin(String uid) async {
+    FirebaseFirestore.instance.collection('dailylogin').add({
+      'name': _emailcont.text,
+      'userid': uid,
+      'login': 1,
+      'timesignup': Timestamp.now(),
+    }).then((id) {
+      _dailyloginrecord(uid);
+    });
+  }
+
+  Future<void> _dailyloginrecord(String uid) async {
+    FirebaseFirestore.instance.collection('loginrecord').doc(uid).set({
+      'name': _emailcont.text,
+      'userid': uid,
+      'login': 1,
+      'timesignup': Timestamp.now(),
+      'logout': null,
+    });
   }
 }

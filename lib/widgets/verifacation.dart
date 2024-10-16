@@ -11,7 +11,7 @@ class VerifacationMessage extends StatefulWidget {
 class _VerifacationMessageState extends State<VerifacationMessage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
