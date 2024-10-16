@@ -285,6 +285,8 @@ class _SignUpFormState extends State<SignUpForm> {
 
         User? user = userCredential.user;
         if (user != null) {
+          await user.sendEmailVerification();
+
           final storageRef = FirebaseStorage.instance
               .ref()
               .child('profile_images')
@@ -301,11 +303,30 @@ class _SignUpFormState extends State<SignUpForm> {
             'profileImage': imageUrl,
             'userid': user.uid,
           }).then((uid) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const LoginForm()));
+            // Inform the user to check their email for verification
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text("Verification Email Sent"),
+                content: const Text(
+                    "A verification email has been sent to your email address. Please check your inbox."),
+                actions: [
+                  TextButton(
+                    child: const Text("OK"),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginForm()));
+                    },
+                  ),
+                ],
+              ),
+            );
           });
 
-          debugPrint("Account created successfully!");
+          debugPrint("Account created successfully! Verification email sent.");
         }
         setState(() {
           islaod = false;

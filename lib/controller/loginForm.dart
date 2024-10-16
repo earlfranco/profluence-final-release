@@ -28,10 +28,11 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: isload != true
-            ? Form(
+    return isload != true
+        ? Scaffold(
+            body: SingleChildScrollView(
+              child: Center(
+                  child: Form(
                 key: _formKey,
                 child: Column(
                   children: [
@@ -158,18 +159,20 @@ class _LoginFormState extends State<LoginForm> {
                     )
                   ],
                 ),
-              )
-            : const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Center(
-                    child: CircularProgressIndicator(),
-                  )
-                ],
-              ),
-      ),
-    );
+              )),
+            ),
+          )
+        : const Scaffold(
+            body: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                  child: CircularProgressIndicator(),
+                )
+              ],
+            ),
+          );
   }
 
   Future<void> _submitform() async {
@@ -177,23 +180,83 @@ class _LoginFormState extends State<LoginForm> {
       isload = true;
     });
     try {
-      await FirebaseAuth.instance
-          .signInWithEmailAndPassword(
-              email: _emailcont.text, password: _passwordcont.text)
-          .then((uid) {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _emailcont.text, password: _passwordcont.text);
+
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null && !user.emailVerified) {
         setState(() {
           isload = false;
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const Homepage()),
-              (Route<dynamic> route) => false);
         });
-      });
+
+        if (!mounted) return;
+
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Email not verified"),
+            content: const Text(
+                "Your email is not verified. Please check your inbox and verify your email to proceed."),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  await user.sendEmailVerification();
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                child: const Text("Resend Verification Email"),
+              ),
+              TextButton(
+                onPressed: () {
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      } else {
+        setState(() {
+          isload = false;
+        });
+
+        if (!mounted) return;
+
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const Homepage()),
+          (Route<dynamic> route) => false,
+        );
+      }
     } catch (error) {
       debugPrint("$error");
       setState(() {
         isload = false;
       });
+
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Login Error"),
+          content: Text(error.toString()),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (mounted) {
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
     }
   }
 }
