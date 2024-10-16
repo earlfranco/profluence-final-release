@@ -182,6 +182,10 @@ class _ViewCommentSectionState extends State<ViewCommentSection> {
                                               getcommentdata['userprofile']),
                                         ),
                                         title: Text(
+                                          "${getcommentdata['username']}",
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                        subtitle: Text(
                                           "${getcommentdata['comment']}",
                                           style: const TextStyle(fontSize: 12),
                                         ),

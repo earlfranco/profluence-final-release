@@ -190,7 +190,12 @@ class _UserProfileState extends State<UserProfile> {
                               backgroundImage:
                                   NetworkImage(userData!['profileImage']),
                             ),
-                            Text(' ${userData!['name'] ?? 'No name'}'),
+                            Text(
+                              (userData!['name'] ?? 'No name')
+                                  .split(' ')
+                                  .take(2)
+                                  .join(' '),
+                            ),
                           ],
                         ),
                         const SizedBox(
