@@ -61,13 +61,10 @@ class DrawerFb1 extends StatelessWidget {
                     onClicked: () async {
                       final currentuser = FirebaseAuth.instance.currentUser;
                       await FirebaseFirestore.instance
-                          .collection('loginrecord')
+                          .collection('users')
                           .doc(currentuser!.uid)
                           .update({
-                        'name': currentuser.email,
-                        'userid': currentuser.email,
-                        'login': 0,
-                        'logout': Timestamp.now(),
+                        'isonline': 0,
                       }).then((uid) {
                         FirebaseAuth.instance.signOut().then((uid) {
                           Navigator.pushAndRemoveUntil(

@@ -313,6 +313,7 @@ class _SignUpFormState extends State<SignUpForm> {
             'email': _emailController.text,
             'schoolId': _schoolIdController.text,
             'valid': 1,
+            'isonline': 0,
             'profileImage': imageUrl,
             'userid': user.uid,
           }).then((uid) {

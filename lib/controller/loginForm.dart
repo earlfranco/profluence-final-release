@@ -332,12 +332,8 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   Future<void> _dailyloginrecord(String uid) async {
-    FirebaseFirestore.instance.collection('loginrecord').doc(uid).set({
-      'name': _emailcont.text,
-      'userid': uid,
-      'login': 1,
-      'timesignup': Timestamp.now(),
-      'logout': null,
+    await FirebaseFirestore.instance.collection('users').doc(uid).update({
+      'isonline': 1,
     });
   }
 }
