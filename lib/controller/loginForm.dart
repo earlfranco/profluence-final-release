@@ -30,91 +30,144 @@ class _LoginFormState extends State<LoginForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: isload != true
-              ? Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextFormField(
-                        controller: _emailcont,
-                        decoration: const InputDecoration(
-                            labelText: 'Email address',
-                            labelStyle: TextStyle(color: Colors.black),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: secondColor),
-                            ),
-                            border: OutlineInputBorder()),
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) {
-                          if (value == null || !value.endsWith('@cpu.edu.ph')) {
-                            return 'Please enter a valid email';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      TextFormField(
-                        controller: _passwordcont,
-                        decoration: const InputDecoration(
-                            labelText: 'Password',
-                            labelStyle: TextStyle(color: Colors.black),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: secondColor),
-                            ),
-                            border: OutlineInputBorder()),
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) {
-                          if (value == null) {
-                            return 'Please enter your password';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        height: 50,
-                        child: GlobalButton(
-                            callback: () {
-                              if (_formKey.currentState!.validate()) {
-                                _submitform();
-                              }
-                            },
-                            title: "Login"),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const SignUpForm()));
-                          },
-                          child: const PrimaryText(
-                            data: "Dont have an account? Sign up",
-                            fcolor: secondColor,
-                          ))
-                    ],
-                  ),
-                )
-              : const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+        child: isload != true
+            ? Form(
+                key: _formKey,
+                child: Column(
                   children: [
-                    Center(
-                      child: CircularProgressIndicator(),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 330,
+                      decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                              bottomRight: Radius.circular(100)),
+                          color: secondColor),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                SizedBox(
+                                    width: 83,
+                                    height: 83,
+                                    child: Image.asset('assets/logo.png')),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                const Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    PrimaryText(
+                                      data: "Socials App",
+                                      fsize: 30,
+                                      fw: FontWeight.bold,
+                                      fcolor: Colors.white,
+                                    ),
+                                    PrimaryText(
+                                      data:
+                                          "Number 1 Social Media app\nfor student",
+                                      fsize: 14,
+                                      fw: FontWeight.normal,
+                                      fcolor: Colors.white,
+                                    )
+                                  ],
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: _emailcont,
+                            decoration: const InputDecoration(
+                                labelText: 'Email address',
+                                labelStyle: TextStyle(color: Colors.black),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: secondColor),
+                                ),
+                                border: OutlineInputBorder()),
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              if (value == null ||
+                                  !value.endsWith('@cpu.edu.ph')) {
+                                return 'Please enter a valid email';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          TextFormField(
+                            controller: _passwordcont,
+                            decoration: const InputDecoration(
+                                labelText: 'Password',
+                                labelStyle: TextStyle(color: Colors.black),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: secondColor),
+                                ),
+                                border: OutlineInputBorder()),
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please enter your password';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(
+                            height: 30,
+                          ),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            height: 50,
+                            child: GlobalButton(
+                                callback: () {
+                                  if (_formKey.currentState!.validate()) {
+                                    _submitform();
+                                  }
+                                },
+                                title: "Login"),
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const SignUpForm()));
+                              },
+                              child: const PrimaryText(
+                                data: "Dont have an account? Sign up",
+                                fcolor: secondColor,
+                              ))
+                        ],
+                      ),
                     )
                   ],
                 ),
-        ),
+              )
+            : const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Center(
+                    child: CircularProgressIndicator(),
+                  )
+                ],
+              ),
       ),
     );
   }
@@ -138,7 +191,7 @@ class _LoginFormState extends State<LoginForm> {
       });
     } catch (error) {
       debugPrint("$error");
-        setState(() {
+      setState(() {
         isload = false;
       });
     }
