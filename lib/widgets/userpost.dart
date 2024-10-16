@@ -374,7 +374,8 @@ class _UsersPostFeedState extends State<UsersPostFeed> {
                                           children: [
                                             Text(
                                               '$likeCount', // Display like count
-                                              style: TextStyle(fontSize: 12),
+                                              style:
+                                                  const TextStyle(fontSize: 12),
                                             ),
                                             IconButton(
                                               onPressed: () {
