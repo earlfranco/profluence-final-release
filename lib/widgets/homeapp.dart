@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:social/controller/createpost.dart';
 import 'package:social/utils/globaltheme.dart';
+import 'package:social/views/profile.dart';
 
 class HomeAppBar extends StatelessWidget {
   const HomeAppBar({
@@ -17,7 +18,13 @@ class HomeAppBar extends StatelessWidget {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          UserProfile(userID: userData!["id"])));
+            },
             child: Container(
               width: 30,
               height: 30,

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social/utils/globaltheme.dart';
+import 'package:social/widgets/tabs.dart';
 
 class UserProfile extends StatefulWidget {
   final String userID;
@@ -48,10 +49,8 @@ class _UserProfileState extends State<UserProfile> {
     }
   }
 
-  // Check if the current user follows the profile user and if they are friends
   Future<void> _checkFollowStatus() async {
     try {
-      // Check if the current user follows the profile user
       DocumentSnapshot followSnapshot = await FirebaseFirestore.instance
           .collection('follows')
           .doc(currentUserID.currentUser!.uid)
@@ -59,7 +58,6 @@ class _UserProfileState extends State<UserProfile> {
           .doc(widget.userID)
           .get();
 
-      // Check if the profile user follows the current user (for friendship status)
       DocumentSnapshot friendSnapshot = await FirebaseFirestore.instance
           .collection('follows')
           .doc(widget.userID)
@@ -76,7 +74,6 @@ class _UserProfileState extends State<UserProfile> {
     }
   }
 
-  // Function to follow or unfollow the user
   Future<void> _toggleFollow() async {
     try {
       DocumentReference followRef = FirebaseFirestore.instance
@@ -86,7 +83,6 @@ class _UserProfileState extends State<UserProfile> {
           .doc(widget.userID);
 
       if (isFollowing) {
-        // Unfollow user
         await followRef.delete();
         setState(() {
           isFollowing = false;
@@ -148,7 +144,6 @@ class _UserProfileState extends State<UserProfile> {
     }
   }
 
-  // Function to get the count of following
   Future<void> _getFollowingCount() async {
     try {
       QuerySnapshot followingSnapshot = await FirebaseFirestore.instance
@@ -221,27 +216,46 @@ class _UserProfileState extends State<UserProfile> {
                               ],
                             ),
                             const SizedBox(height: 30),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: secondColor,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(9))),
-                              onPressed: _toggleFollow,
-                              child: Text(
-                                style: const TextStyle(color: Colors.white),
-                                isFriend
-                                    ? 'Friends'
-                                    : isFollowing
-                                        ? 'Following'
-                                        : 'Follow',
-                              ),
-                            ),
+                            widget.userID == currentUserID.currentUser!.uid
+                                ? ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                            side: const BorderSide(
+                                                width: 1, color: Colors.black),
+                                            borderRadius:
+                                                BorderRadius.circular(9))),
+                                    onPressed: () {},
+                                    child: const Text(
+                                        style: TextStyle(color: Colors.black),
+                                        "Hello, Welcome!"),
+                                  )
+                                : ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: secondColor,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(9))),
+                                    onPressed: _toggleFollow,
+                                    child: Text(
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                      isFriend
+                                          ? 'Friends'
+                                          : isFollowing
+                                              ? 'Following'
+                                              : 'Follow',
+                                    ),
+                                  ),
                           ],
                         ),
                       ],
                     ),
                     const SizedBox(height: 20),
-                    // Additional profile content here...
+                    // SizedBox(
+                    //     width: MediaQuery.of(context).size.width,
+                    //     height: MediaQuery.of(context).size.height * 0.60,
+                    //     child: const TabBarAndTabViews())
                   ],
                 ),
               ),
