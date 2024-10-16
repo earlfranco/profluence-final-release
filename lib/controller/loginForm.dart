@@ -138,6 +138,9 @@ class _LoginFormState extends State<LoginForm> {
       });
     } catch (error) {
       debugPrint("$error");
+        setState(() {
+        isload = false;
+      });
     }
   }
 }
