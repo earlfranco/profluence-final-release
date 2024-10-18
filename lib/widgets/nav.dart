@@ -4,80 +4,150 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social/controller/loginForm.dart';
+import 'package:social/utils/globaltheme.dart';
 import 'package:social/views/chat.dart';
 import 'package:social/views/following.dart';
 import 'package:social/views/notif.dart';
 import 'package:social/views/profile.dart';
 
-class DrawerFb1 extends StatelessWidget {
+class DrawerFb1 extends StatefulWidget {
   const DrawerFb1({super.key});
+
+  @override
+  State<DrawerFb1> createState() => _DrawerFb1State();
+}
+
+class _DrawerFb1State extends State<DrawerFb1> {
+  final User? user = FirebaseAuth.instance.currentUser;
+  Map<String, dynamic>? userData;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    if (user != null) {
+      try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user!.uid)
+            .get();
+
+        if (userDoc.exists) {
+          setState(() {
+            userData = userDoc.data() as Map<String, dynamic>;
+            userData!['id'] = userDoc.id;
+          });
+        } else {
+          debugPrint('No such user data in Firestore');
+        }
+      } catch (e) {
+        debugPrint('Error fetching user data: $e');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: Material(
         color: const Color(0xff4338CA),
-        child: ListView(
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: [
-                  const SizedBox(height: 12),
-                  MenuItem(
-                    text: 'Following',
-                    icon: Icons.people,
-                    onClicked: () => selectedItem(context, 0),
-                  ),
-                  const SizedBox(height: 5),
-                  MenuItem(
-                    text: 'Profile',
-                    icon: Icons.person_outline,
-                    onClicked: () => selectedItem(context, 1),
-                  ),
-                  const SizedBox(height: 5),
-                  MenuItem(
-                    text: 'Messages',
-                    icon: Icons.workspaces_outline,
-                    onClicked: () => selectedItem(context, 2),
-                  ),
-                  const SizedBox(height: 5),
-                  const SizedBox(height: 8),
-                  const Divider(color: Colors.white70),
-                  const SizedBox(height: 8),
-                  MenuItem(
-                    text: 'Notifications',
-                    icon: Icons.notifications_outlined,
-                    onClicked: () => selectedItem(context, 3),
-                  ),
-                  MenuItem(
-                    text: 'Settings',
-                    icon: Icons.settings,
-                    onClicked: () => selectedItem(context, 6),
-                  ),
-                  MenuItem(
-                    text: 'Logout',
-                    icon: Icons.logout_rounded,
-                    onClicked: () async {
-                      final currentuser = FirebaseAuth.instance.currentUser;
-                      await FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(currentuser!.uid)
-                          .update({
-                        'isonline': 0,
-                      }).then((uid) {
-                        FirebaseAuth.instance.signOut().then((uid) {
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginForm()),
-                              (Route<dynamic> route) => false);
-                        });
-                      });
-                    },
-                  ),
-                ],
-              ),
+        child: Column(
+          children: [
+            SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: UserAccountsDrawerHeader(
+                    decoration: const BoxDecoration(color: Colors.white),
+                    currentAccountPicture: GestureDetector(
+                      onTap: () {
+                        userData != null
+                            ? Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => UserProfile(
+                                          userID: userData!['id'],
+                                        )))
+                            : null;
+                      },
+                      child: CircleAvatar(
+                        foregroundImage: NetworkImage(userData != null
+                            ? userData!['profileImage']
+                            : "https://avatar.iran.liara.run/public "),
+                      ),
+                    ),
+                    accountName: PrimaryText(
+                        data: userData != null ? userData!['name'] : ""),
+                    accountEmail: PrimaryText(
+                      data: userData != null ? userData!['email'] : "",
+                    ))
+
+                // DrawerHeader(
+                //     decoration: BoxDecoration(color: Colors.white),
+                //     child: Column(
+                //       children: [
+                //         userData != null
+                //             ? CircleAvatar(
+                //                 foregroundImage:
+                //                     NetworkImage(userData!['profileImage']),
+                //               )
+                //             : Container(),
+                //       ],
+                //     )),
+                ),
+            const SizedBox(height: 12),
+            MenuItem(
+              text: 'Following',
+              icon: Icons.people,
+              onClicked: () => selectedItem(context, 0),
+            ),
+            const SizedBox(height: 5),
+            MenuItem(
+              text: 'Profile',
+              icon: Icons.person_outline,
+              onClicked: () => selectedItem(context, 1),
+            ),
+            const SizedBox(height: 5),
+            MenuItem(
+              text: 'Messages',
+              icon: Icons.workspaces_outline,
+              onClicked: () => selectedItem(context, 2),
+            ),
+            const SizedBox(height: 5),
+            const SizedBox(height: 8),
+            const Divider(color: Colors.white70),
+            const SizedBox(height: 8),
+            MenuItem(
+              text: 'Notifications',
+              icon: Icons.notifications_outlined,
+              onClicked: () => selectedItem(context, 3),
+            ),
+            MenuItem(
+              text: 'Settings',
+              icon: Icons.settings,
+              onClicked: () => selectedItem(context, 6),
+            ),
+            MenuItem(
+              text: 'Logout',
+              icon: Icons.logout_rounded,
+              onClicked: () async {
+                final currentuser = FirebaseAuth.instance.currentUser;
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(currentuser!.uid)
+                    .update({
+                  'isonline': 0,
+                }).then((uid) {
+                  FirebaseAuth.instance.signOut().then((uid) {
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginForm()),
+                        (Route<dynamic> route) => false);
+                  });
+                });
+              },
             ),
           ],
         ),

@@ -55,7 +55,7 @@ class _HomepageState extends State<Homepage> {
       appBar: AppBar(
         titleSpacing: 2,
         title: Text(
-          "Socials",
+          "Profluence",
           style: GoogleFonts.dancingScript(
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 35),
         ),
