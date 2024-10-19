@@ -63,7 +63,7 @@ class _LoginFormState extends State<LoginForm> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     PrimaryText(
-                                      data: "Socials App",
+                                      data: "Profluence",
                                       fsize: 30,
                                       fw: FontWeight.bold,
                                       fcolor: Colors.white,

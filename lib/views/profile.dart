@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:social/controller/editprofile.dart';
 import 'package:social/utils/globaltheme.dart';
 import 'package:social/widgets/tabs.dart';
 
@@ -239,10 +240,21 @@ class _UserProfileState extends State<UserProfile> {
                                                 width: 1, color: Colors.black),
                                             borderRadius:
                                                 BorderRadius.circular(9))),
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  EditprofilePage(
+                                                    userID: currentUserID
+                                                        .currentUser!.uid,
+                                                    userProfile: userData![
+                                                        'profileImage'],
+                                                  )));
+                                    },
                                     child: const Text(
                                         style: TextStyle(color: Colors.black),
-                                        "Hello, Welcome!"),
+                                        "Edit Profile"),
                                   )
                                 : ElevatedButton(
                                     style: ElevatedButton.styleFrom(
