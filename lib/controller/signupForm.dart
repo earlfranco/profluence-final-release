@@ -272,17 +272,6 @@ class _SignUpFormState extends State<SignUpForm> {
     }
   }
 
-  Future<void> _dailysignup(String imageUrl, String uid) async {
-    FirebaseFirestore.instance.collection('users').add({
-      'name': _nameController.text,
-      'email': _emailController.text,
-      'schoolId': _schoolIdController.text,
-      'profileImage': imageUrl,
-      'userid': uid,
-      'timesignup': Timestamp.now(),
-    });
-  }
-
   Future<void> _submitForm() async {
     setState(() {
       islaod = true;
@@ -316,6 +305,7 @@ class _SignUpFormState extends State<SignUpForm> {
             'isonline': 0,
             'profileImage': imageUrl,
             'userid': user.uid,
+            'timesignup': Timestamp.now(),
           }).then((uid) {
             // Inform the user to check their email for verification
             showDialog(
@@ -339,7 +329,7 @@ class _SignUpFormState extends State<SignUpForm> {
               ),
             );
           });
-          await _dailysignup(imageUrl, user.uid);
+
           debugPrint("Account created successfully! Verification email sent.");
         }
       } else {
