@@ -85,24 +85,27 @@ class _GetFollowingStoryState extends State<GetFollowingStory> {
                           ),
                         );
                       },
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(2.0),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: secondColor,
-                                width: 2,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(2.0),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: secondColor,
+                                  width: 2,
+                                ),
+                              ),
+                              child: CircleAvatar(
+                                maxRadius: 30,
+                                backgroundImage:
+                                    NetworkImage(story['imageUrl'] ?? ""),
                               ),
                             ),
-                            child: CircleAvatar(
-                              maxRadius: 30,
-                              backgroundImage:
-                                  NetworkImage(story['imageUrl'] ?? ""),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     );
                   } else {
