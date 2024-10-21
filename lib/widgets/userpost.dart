@@ -5,6 +5,7 @@ import 'package:social/utils/globaltheme.dart';
 import 'package:social/views/getstory.dart';
 import 'package:social/views/photoview.dart';
 import 'package:social/views/profile.dart';
+import 'package:social/widgets/morevert.dart';
 import 'package:social/widgets/viewcomments.dart';
 
 class UsersPostFeed extends StatefulWidget {
@@ -126,7 +127,7 @@ class _UsersPostFeedState extends State<UsersPostFeed> {
               return const Center(child: CircularProgressIndicator());
             }
 
-            userPosts = snapshot.data!; // Update userPosts with stream data
+            userPosts = snapshot.data!;
 
             return ListView.builder(
               shrinkWrap: true,
@@ -153,24 +154,34 @@ class _UsersPostFeedState extends State<UsersPostFeed> {
                               } else {
                                 var userData = snapshot.data!.data();
                                 return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => UserProfile(
-                                                userID: postData['userID']),
+                                    Row(
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    UserProfile(
+                                                        userID:
+                                                            postData['userID']),
+                                              ),
+                                            );
+                                          },
+                                          child: CircleAvatar(
+                                            foregroundImage: NetworkImage(
+                                                '${userData!['profileImage']}'),
                                           ),
-                                        );
-                                      },
-                                      child: CircleAvatar(
-                                        foregroundImage: NetworkImage(
-                                            '${userData!['profileImage']}'),
-                                      ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text("${userData['name']}"),
+                                      ],
                                     ),
-                                    const SizedBox(width: 10),
-                                    Text("${userData['name']}"),
+                                    morevertOption(postData['userID'], context,
+                                        postData, postID)
                                   ],
                                 );
                               }

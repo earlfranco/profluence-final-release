@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:social/controller/searchuser.dart';
+import 'package:social/utils/globaltheme.dart';
 import 'package:social/views/profile.dart';
 import 'package:social/widgets/chatwidget.dart';
 import 'package:social/widgets/homeapp.dart';
@@ -86,7 +87,7 @@ class _ChatSystemState extends State<ChatSystem> {
       appBar: AppBar(
         titleSpacing: 2,
         title: Text(
-          "Socials",
+          "Messages",
           style: GoogleFonts.dancingScript(
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 35),
         ),
@@ -142,9 +143,7 @@ class _ChatSystemState extends State<ChatSystem> {
                     );
                   },
                 )
-              : const Center(
-                  child:
-                      CircularProgressIndicator()), // Show a loader while data is loading
+              : const Center(child: PrimaryText(data: "No messages available")),
         ),
       ),
     );

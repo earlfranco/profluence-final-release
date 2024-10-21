@@ -286,20 +286,6 @@ class _EditprofilePageState extends State<EditprofilePage> {
                               style: const TextStyle(color: secondColor),
                             ),
                           ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const LoginForm(),
-                                ),
-                              );
-                            },
-                            child: const PrimaryText(
-                              data: "Already have an account? Login",
-                              fcolor: secondColor,
-                            ),
-                          )
                         ],
                       ),
                     ),
