@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:social/utils/globaltheme.dart';
 import 'package:social/views/photoview.dart';
+import 'package:social/widgets/hashtag.dart';
 import 'package:social/widgets/morevert.dart';
 import 'package:social/widgets/viewcomments.dart';
 
@@ -150,134 +150,140 @@ class _OwnRepostedState extends State<OwnReposted> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: userPosts.length,
-          itemBuilder: (context, index) {
-            var postData = userPosts[index].data() as Map<String, dynamic>;
-            var postID = userPosts[index].id;
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: userPosts.length,
+            itemBuilder: (context, index) {
+              var postData = userPosts[index].data() as Map<String, dynamic>;
+              var postID = userPosts[index].id;
 
-            if (postData['type'] != 'story') {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: FutureBuilder(
-                        future: FirebaseFirestore.instance
-                            .collection('users')
-                            .doc(postData['userID'])
-                            .get(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return Container();
-                          } else {
-                            var userdata = snapshot.data!.data();
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    CircleAvatar(
-                                      foregroundImage: NetworkImage(
-                                          '${userdata!['profileImage']}'),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text("${userdata['name']}")
-                                  ],
-                                ),
-                                morevertOption(postData['userID'], context,
-                                    postData, postID)
-                              ],
-                            );
-                          }
-                        }),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              MyImageView(imageUrl: postData['imageUrl']),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: 205,
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              fit: BoxFit.cover,
-                              image: NetworkImage(postData['imageUrl']))),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 3,
-                  ),
-                  PrimaryText(
-                    data: postData['description'] != null
-                        ? (postData['description'] as String)
-                            .split(' ')
-                            .take(5)
-                            .join(' ')
-                        : '',
-                  ),
-                  Row(
-                    children: [
-                      IconButton(
-                          onPressed: () {
-                            userpostliked(postID);
-                          },
-                          icon: Icon(
-                            likedPosts.contains(postID)
-                                ? Icons.favorite
-                                : Icons.favorite_outline,
-                            color:
-                                likedPosts.contains(postID) ? Colors.red : null,
-                          )),
-                      const SizedBox(
-                        width: 3,
-                      ),
-                      Text(
-                        '${postLikeCounts[postID] ?? ''}',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      IconButton(
-                          onPressed: () {
-                            setState(() {
-                              ispostcomment = postID;
-                            });
-                            if (ispostcomment == postID) {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ViewCommentSection(
-                                            postID: postID,
-                                            userData: userData,
-                                          )));
+              if (postData['type'] != 'story') {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: FutureBuilder(
+                          future: FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(postData['userID'])
+                              .get(),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return Container();
+                            } else {
+                              var userdata = snapshot.data!.data();
+                              return Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      CircleAvatar(
+                                        foregroundImage: NetworkImage(
+                                            '${userdata!['profileImage']}'),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text("${userdata['name']}")
+                                    ],
+                                  ),
+                                  morevertOption(postData['userID'], context,
+                                      postData, postID)
+                                ],
+                              );
                             }
-                          },
-                          icon: const Icon(Icons.comment_outlined)),
-                      IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.autorenew_outlined)),
-                    ],
-                  ),
-                ],
-              );
-            } else {
-              return Container();
-            }
-          },
-        ),
-      ],
+                          }),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                MyImageView(imageUrl: postData['imageUrl']),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: 205,
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: NetworkImage(postData['imageUrl']))),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 3,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: RichText(
+                        text: TextSpan(
+                          children: buildDescriptionWithHashtags(
+                              postData['description']),
+                        ),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                            onPressed: () {
+                              userpostliked(postID);
+                            },
+                            icon: Icon(
+                              likedPosts.contains(postID)
+                                  ? Icons.favorite
+                                  : Icons.favorite_outline,
+                              color: likedPosts.contains(postID)
+                                  ? Colors.red
+                                  : null,
+                            )),
+                        const SizedBox(
+                          width: 3,
+                        ),
+                        Text(
+                          '${postLikeCounts[postID] ?? ''}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
+                                ispostcomment = postID;
+                              });
+                              if (ispostcomment == postID) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ViewCommentSection(
+                                              postID: postID,
+                                              userData: userData,
+                                            )));
+                              }
+                            },
+                            icon: const Icon(Icons.comment_outlined)),
+                        IconButton(
+                            onPressed: () {},
+                            icon: const Icon(Icons.autorenew_outlined)),
+                      ],
+                    ),
+                  ],
+                );
+              } else {
+                return Container();
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 

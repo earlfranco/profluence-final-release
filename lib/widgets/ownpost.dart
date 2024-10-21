@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:social/utils/globaltheme.dart';
 import 'package:social/views/photoview.dart';
+import 'package:social/widgets/hashtag.dart';
 import 'package:social/widgets/morevert.dart';
 import 'package:social/widgets/viewcomments.dart';
 
@@ -227,13 +227,14 @@ class _OwnUsersPostFeedState extends State<OwnUsersPostFeed> {
                   const SizedBox(
                     height: 3,
                   ),
-                  PrimaryText(
-                    data: postData['description'] != null
-                        ? (postData['description'] as String)
-                            .split(' ')
-                            .take(5)
-                            .join(' ')
-                        : '',
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: RichText(
+                      text: TextSpan(
+                        children: buildDescriptionWithHashtags(
+                            postData['description']),
+                      ),
+                    ),
                   ),
                   Row(
                     children: [

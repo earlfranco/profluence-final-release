@@ -179,103 +179,108 @@ class _UserProfileState extends State<UserProfile> {
       body: userData != null
           ? SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(18.0),
+                padding: const EdgeInsets.all(0.0),
                 child: Column(
                   children: [
-                    Row(
-                      children: [
-                        Column(
-                          children: [
-                            CircleAvatar(
-                              maxRadius: 50,
-                              backgroundImage:
-                                  NetworkImage(userData!['profileImage']),
-                            ),
-                            Text(
-                              (userData!['name'] ?? 'No name')
-                                  .split(' ')
-                                  .take(2)
-                                  .join(' '),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  children: [
-                                    Text("$numberofpost"),
-                                    const Text("post"),
-                                  ],
-                                ),
-                                const SizedBox(width: 15),
-                                Column(
-                                  children: [
-                                    Text("$followerCount"),
-                                    const Text("followers"),
-                                  ],
-                                ),
-                                const SizedBox(width: 15),
-                                Column(
-                                  children: [
-                                    Text("$followingCount"),
-                                    const Text("following"),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 30),
-                            widget.userID == currentUserID.currentUser!.uid
-                                ? ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                            side: const BorderSide(
-                                                width: 1, color: Colors.black),
-                                            borderRadius:
-                                                BorderRadius.circular(9))),
-                                    onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  EditprofilePage(
-                                                    userID: currentUserID
-                                                        .currentUser!.uid,
-                                                    userProfile: userData![
-                                                        'profileImage'],
-                                                  )));
-                                    },
-                                    child: const Text(
-                                        style: TextStyle(color: Colors.black),
-                                        "Edit Profile"),
-                                  )
-                                : ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: secondColor,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(9))),
-                                    onPressed: _toggleFollow,
-                                    child: Text(
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                      isFriend
-                                          ? 'Friends'
-                                          : isFollowing
-                                              ? 'Following'
-                                              : 'Follow',
-                                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Column(
+                            children: [
+                              CircleAvatar(
+                                maxRadius: 50,
+                                backgroundImage:
+                                    NetworkImage(userData!['profileImage']),
+                              ),
+                              Text(
+                                (userData!['name'] ?? 'No name')
+                                    .split(' ')
+                                    .take(2)
+                                    .join(' '),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Text("$numberofpost"),
+                                      const Text("post"),
+                                    ],
                                   ),
-                          ],
-                        ),
-                      ],
+                                  const SizedBox(width: 15),
+                                  Column(
+                                    children: [
+                                      Text("$followerCount"),
+                                      const Text("followers"),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 15),
+                                  Column(
+                                    children: [
+                                      Text("$followingCount"),
+                                      const Text("following"),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 30),
+                              widget.userID == currentUserID.currentUser!.uid
+                                  ? ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                              side: const BorderSide(
+                                                  width: 1,
+                                                  color: Colors.black),
+                                              borderRadius:
+                                                  BorderRadius.circular(9))),
+                                      onPressed: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    EditprofilePage(
+                                                      userID: currentUserID
+                                                          .currentUser!.uid,
+                                                      userProfile: userData![
+                                                          'profileImage'],
+                                                    )));
+                                      },
+                                      child: const Text(
+                                          style: TextStyle(color: Colors.black),
+                                          "Edit Profile"),
+                                    )
+                                  : ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: secondColor,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(9))),
+                                      onPressed: _toggleFollow,
+                                      child: Text(
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                        isFriend
+                                            ? 'Friends'
+                                            : isFollowing
+                                                ? 'Following'
+                                                : 'Follow',
+                                      ),
+                                    ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 20),
                     SizedBox(

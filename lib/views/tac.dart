@@ -82,7 +82,7 @@ Thank you for being a part of the Profluence community!
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
           ],
         ),
       ),
