@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social/utils/globaltheme.dart';
 import 'package:social/views/photoview.dart';
+import 'package:social/widgets/morevert.dart';
 import 'package:social/widgets/viewcomments.dart';
 
 class OwnUsersPostFeed extends StatefulWidget {
@@ -183,15 +184,22 @@ class _OwnUsersPostFeedState extends State<OwnUsersPostFeed> {
                           } else {
                             var userdata = snapshot.data!.data();
                             return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                CircleAvatar(
-                                  foregroundImage: NetworkImage(
-                                      '${userdata!['profileImage']}'),
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      foregroundImage: NetworkImage(
+                                          '${userdata!['profileImage']}'),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text("${userdata['name']}")
+                                  ],
                                 ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Text("${userdata['name']}")
+                                morevertOption(postData['userID'], context,
+                                    postData, postID)
                               ],
                             );
                           }

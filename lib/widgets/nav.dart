@@ -8,7 +8,9 @@ import 'package:social/utils/globaltheme.dart';
 import 'package:social/views/chat.dart';
 import 'package:social/views/following.dart';
 import 'package:social/views/notif.dart';
+import 'package:social/views/pap.dart';
 import 'package:social/views/profile.dart';
+import 'package:social/views/tac.dart';
 
 class DrawerFb1 extends StatefulWidget {
   const DrawerFb1({super.key});
@@ -124,9 +126,14 @@ class _DrawerFb1State extends State<DrawerFb1> {
               onClicked: () => selectedItem(context, 3),
             ),
             MenuItem(
-              text: 'Settings',
-              icon: Icons.settings,
+              text: 'Privacy and Policy',
+              icon: Icons.privacy_tip_outlined,
               onClicked: () => selectedItem(context, 6),
+            ),
+            MenuItem(
+              text: 'Terms and Conditions',
+              icon: Icons.security_outlined,
+              onClicked: () => selectedItem(context, 7),
             ),
             MenuItem(
               text: 'Logout',
@@ -178,6 +185,16 @@ class _DrawerFb1State extends State<DrawerFb1> {
       case 3:
         Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => const ShowNotification(), // Page 2
+        ));
+        break;
+      case 6:
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const PrivacyPolicyScreen(), // Page 2
+        ));
+        break;
+      case 7:
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const TermsConditionsScreen(), // Page 2
         ));
         break;
     }
