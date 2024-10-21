@@ -6,7 +6,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:social/controller/loginForm.dart';
 import 'package:social/utils/globaltheme.dart';
 
 class EditprofilePage extends StatefulWidget {
