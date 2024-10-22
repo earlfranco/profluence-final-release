@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social/views/photoview.dart';
 import 'package:social/widgets/hashtag.dart';
+import 'package:social/widgets/mediaplayer.dart';
 import 'package:social/widgets/morevert.dart';
 import 'package:social/widgets/viewcomments.dart';
 
@@ -201,25 +202,28 @@ class _OwnRepostedState extends State<OwnReposted> {
                             }
                           }),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                MyImageView(imageUrl: postData['imageUrl']),
+                    postData['mediaType'] == 'video'
+                        ? MediaPost(mediaUrl: postData['imageUrl'])
+                        : GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MyImageView(
+                                      imageUrl: postData['imageUrl']),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width,
+                              height: 205,
+                              decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image:
+                                          NetworkImage(postData['imageUrl']))),
+                            ),
                           ),
-                        );
-                      },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: 205,
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                                fit: BoxFit.cover,
-                                image: NetworkImage(postData['imageUrl']))),
-                      ),
-                    ),
                     const SizedBox(
                       height: 3,
                     ),

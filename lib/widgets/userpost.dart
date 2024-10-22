@@ -5,6 +5,7 @@ import 'package:social/views/getstory.dart';
 import 'package:social/views/photoview.dart';
 import 'package:social/views/profile.dart';
 import 'package:social/widgets/hashtag.dart';
+import 'package:social/widgets/mediaplayer.dart';
 import 'package:social/widgets/morevert.dart';
 import 'package:social/widgets/viewcomments.dart';
 
@@ -189,25 +190,28 @@ class _UsersPostFeedState extends State<UsersPostFeed> {
                                 }
                               }),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    MyImageView(imageUrl: postData['imageUrl']),
+                        postData['mediaType'] == 'video'
+                            ? MediaPost(mediaUrl: postData['imageUrl'])
+                            : GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MyImageView(
+                                          imageUrl: postData['imageUrl']),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 230,
+                                  decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                          fit: BoxFit.cover,
+                                          image: NetworkImage(
+                                              postData['imageUrl']))),
+                                ),
                               ),
-                            );
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 230,
-                            decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    fit: BoxFit.cover,
-                                    image: NetworkImage(postData['imageUrl']))),
-                          ),
-                        ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: RichText(

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:social/views/photoview.dart';
 import 'package:social/views/profile.dart';
 import 'package:social/widgets/hashtag.dart';
+import 'package:social/widgets/mediaplayer.dart';
+import 'package:social/widgets/morevert.dart';
 import 'package:social/widgets/viewcomments.dart';
 
 class ForyouPage extends StatefulWidget {
@@ -236,19 +238,28 @@ class _ForyouPageState extends State<ForyouPage> {
                                                 following(postData['userID']);
                                               }
                                             },
-                                            child: Text(
-                                              postData['userID'] !=
-                                                      currentUserID
-                                                  ? isFollowing
-                                                      ? "Following"
-                                                      : "Follow"
-                                                  : "",
-                                              style: TextStyle(
-                                                color: isFollowing
-                                                    ? Colors.grey
-                                                    : Colors.blue,
-                                              ),
-                                            ),
+                                            child: postData['userID'] !=
+                                                    currentUserID
+                                                ? isFollowing == false
+                                                    ? Text(
+                                                        postData['userID'] !=
+                                                                currentUserID
+                                                            ? isFollowing
+                                                                ? "Following"
+                                                                : "Follow"
+                                                            : "",
+                                                        style: TextStyle(
+                                                          color: isFollowing
+                                                              ? Colors.grey
+                                                              : Colors.blue,
+                                                        ),
+                                                      )
+                                                    : morevertOption(
+                                                        postData['userID'],
+                                                        context,
+                                                        postData,
+                                                        postID)
+                                                : Container(),
                                           );
                                         },
                                       ),
@@ -257,25 +268,28 @@ class _ForyouPageState extends State<ForyouPage> {
                                 }
                               }),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    MyImageView(imageUrl: postData['imageUrl']),
+                        postData['mediaType'] == 'video'
+                            ? MediaPost(mediaUrl: postData['imageUrl'])
+                            : GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MyImageView(
+                                          imageUrl: postData['imageUrl']),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 230,
+                                  decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                          fit: BoxFit.cover,
+                                          image: NetworkImage(
+                                              postData['imageUrl']))),
+                                ),
                               ),
-                            );
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 230,
-                            decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    fit: BoxFit.cover,
-                                    image: NetworkImage(postData['imageUrl']))),
-                          ),
-                        ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: RichText(

@@ -88,7 +88,7 @@ class _CreateUserPostState extends State<CreateUserPost> {
           .add({
         'userID': widget.userID,
         'description': _postdes.text,
-        'mediaUrl': mediaUrl,
+        'imageUrl': mediaUrl,
         'mediaType': isVideo ? 'video' : 'image',
         'type': type,
         'createdAt': FieldValue.serverTimestamp(),
