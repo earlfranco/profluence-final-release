@@ -194,9 +194,14 @@ Future<void> editpost(
 Future<void> submitReport(
     BuildContext context, Map<String, dynamic> postData, String report) async {
   try {
-    await FirebaseFirestore.instance.collection('reports').add({
+    await FirebaseFirestore.instance
+        .collection('reports')
+        .doc(postData['userID'])
+        .collection('report')
+        .add({
       'userID': postData['userID'],
       'reporttitle': report,
+      'reportcreated': Timestamp.now()
     });
     await modalMessage("$report has been submitted",
         Navigator.of(context).context, "Report Submitted");

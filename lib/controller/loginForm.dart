@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social/controller/forgotpassword.dart';
 import 'package:social/controller/signupForm.dart';
 import 'package:social/utils/globaltheme.dart';
@@ -26,6 +27,24 @@ class _LoginFormState extends State<LoginForm> {
     super.dispose();
     _emailcont.dispose();
     _passwordcont.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSavedCredentials();
+  }
+
+  Future<void> _checkSavedCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? savedEmail = prefs.getString('email');
+    String? savedPassword = prefs.getString('password');
+
+    if (savedEmail != null && savedPassword != null) {
+      _emailcont.text = savedEmail;
+      _passwordcont.text = savedPassword;
+      _submitform(autoLogin: true);
+    }
   }
 
   @override
@@ -112,6 +131,7 @@ class _LoginFormState extends State<LoginForm> {
                           const SizedBox(height: 20),
                           TextFormField(
                             controller: _passwordcont,
+                            obscureText: true,
                             decoration: const InputDecoration(
                                 labelText: 'Password',
                                 labelStyle: TextStyle(color: Colors.black),
@@ -195,12 +215,13 @@ class _LoginFormState extends State<LoginForm> {
           );
   }
 
-  Future<void> _submitform() async {
+  Future<void> _submitform({bool autoLogin = false}) async {
     setState(() {
       isload = true;
     });
 
     try {
+      // Attempt to sign in with email and password
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailcont.text,
         password: _passwordcont.text,
@@ -208,60 +229,87 @@ class _LoginFormState extends State<LoginForm> {
 
       User? user = FirebaseAuth.instance.currentUser;
 
-      if (user != null && !user.emailVerified) {
-        setState(() {
-          isload = false;
-        });
+      if (user != null) {
+        // Check if the user is banned by looking at the "isvalid" field in Firestore
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
 
-        if (!mounted) return;
+        if (userDoc.exists && userDoc['isvalid'] == 2) {
+          // If "isvalid" is 2, show a modal saying the user is banned
+          setState(() {
+            isload = false;
+          });
 
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text("Email not verified"),
-            content: const Text(
-                "Your email is not verified. Please check your inbox and verify your email to proceed."),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  await user.sendEmailVerification();
-                  if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text("Account Banned"),
+              content: const Text(
+                  "Your account has been banned for violating our privacy and policy."),
+              actions: [
+                TextButton(
+                  onPressed: () {
                     Navigator.of(context).pop();
-                  }
-                },
-                child: const Text("Resend Verification Email"),
-              ),
-              TextButton(
-                onPressed: () {
-                  if (mounted) {
+                  },
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
+          );
+        } else if (!user.emailVerified) {
+          setState(() {
+            isload = false;
+          });
+
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text("Email not verified"),
+              content: const Text(
+                  "Your email is not verified. Please check your inbox and verify your email to proceed."),
+              actions: [
+                TextButton(
+                  onPressed: () async {
+                    await user.sendEmailVerification();
                     Navigator.of(context).pop();
-                  }
-                },
-                child: const Text("OK"),
-              ),
-            ],
-          ),
-        );
-      } else {
-        setState(() {
-          isload = false;
-        });
+                  },
+                  child: const Text("Resend Verification Email"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
+          );
+        } else {
+          setState(() {
+            isload = false;
+          });
 
-        if (!mounted) return;
+          if (!autoLogin) {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setString('email', _emailcont.text);
+            await prefs.setString('password', _passwordcont.text);
+          }
 
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const Homepage()),
-          (Route<dynamic> route) => false,
-        );
-        await _dailylogin(user!.uid);
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const Homepage()),
+            (Route<dynamic> route) => false,
+          );
+
+          await _dailylogin(user.uid);
+        }
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
         isload = false;
       });
-
-      if (!mounted) return;
 
       String errorMessage = "An error occurred. Please try again.";
       if (e.code == 'user-not-found') {
@@ -284,9 +332,7 @@ class _LoginFormState extends State<LoginForm> {
           actions: [
             TextButton(
               onPressed: () {
-                if (mounted) {
-                  Navigator.of(context).pop();
-                }
+                Navigator.of(context).pop();
               },
               child: const Text("OK"),
             ),
@@ -298,8 +344,6 @@ class _LoginFormState extends State<LoginForm> {
         isload = false;
       });
 
-      if (!mounted) return;
-
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -308,9 +352,7 @@ class _LoginFormState extends State<LoginForm> {
           actions: [
             TextButton(
               onPressed: () {
-                if (mounted) {
-                  Navigator.of(context).pop();
-                }
+                Navigator.of(context).pop();
               },
               child: const Text("OK"),
             ),

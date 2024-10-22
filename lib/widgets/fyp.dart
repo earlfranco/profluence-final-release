@@ -346,6 +346,7 @@ class _ForyouPageState extends State<ForyouPage> {
                                         '${postData['imageUrl']}',
                                         'post',
                                         '${postData['userID']}',
+                                        '${postData['mediaType']}',
                                       );
                                     },
                                     icon: const Icon(Icons.autorenew_outlined))
@@ -369,8 +370,8 @@ class _ForyouPageState extends State<ForyouPage> {
     );
   }
 
-  Future<void> repostBtn(
-      String des, String imgUrl, String type, String userId) async {
+  Future<void> repostBtn(String des, String imgUrl, String type, String userId,
+      String mediatype) async {
     setState(() {
       isReposting = true;
     });
@@ -383,6 +384,7 @@ class _ForyouPageState extends State<ForyouPage> {
         'userID': userId,
         'description': des,
         'imageUrl': imgUrl,
+        'mediaType': mediatype,
         'type': type,
         'createdAt': FieldValue.serverTimestamp(),
       });

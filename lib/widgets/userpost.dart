@@ -264,11 +264,11 @@ class _UsersPostFeedState extends State<UsersPostFeed> {
                                 ? IconButton(
                                     onPressed: () {
                                       repostBtn(
-                                        '${postData['description']}',
-                                        '${postData['imageUrl']}',
-                                        'post',
-                                        '${postData['userID']}',
-                                      );
+                                          '${postData['description']}',
+                                          '${postData['imageUrl']}',
+                                          'post',
+                                          '${postData['userID']}',
+                                          '${postData['mediaType']}');
                                     },
                                     icon: const Icon(Icons.autorenew_outlined))
                                 : const SizedBox(
@@ -291,8 +291,8 @@ class _UsersPostFeedState extends State<UsersPostFeed> {
     );
   }
 
-  Future<void> repostBtn(
-      String des, String imgUrl, String type, String userId) async {
+  Future<void> repostBtn(String des, String imgUrl, String type, String userId,
+      String mediatype) async {
     setState(() {
       isReposting = true;
     });
@@ -305,6 +305,7 @@ class _UsersPostFeedState extends State<UsersPostFeed> {
         'userID': userId,
         'description': des,
         'imageUrl': imgUrl,
+        'mediaType': mediatype,
         'type': type,
         'createdAt': FieldValue.serverTimestamp(),
       });
