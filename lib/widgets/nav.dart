@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social/controller/loginForm.dart';
 import 'package:social/utils/globaltheme.dart';
 import 'package:social/views/chat.dart';
@@ -140,20 +141,28 @@ class _DrawerFb1State extends State<DrawerFb1> {
               icon: Icons.logout_rounded,
               onClicked: () async {
                 final currentuser = FirebaseAuth.instance.currentUser;
-                await FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(currentuser!.uid)
-                    .update({
-                  'isonline': 0,
-                }).then((uid) {
-                  FirebaseAuth.instance.signOut().then((uid) {
-                    Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginForm()),
-                        (Route<dynamic> route) => false);
+
+                if (currentuser != null) {
+                  await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(currentuser.uid)
+                      .update({
+                    'isonline': 0,
                   });
-                });
+
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  await prefs.remove('email');
+                  await prefs.remove('password');
+
+                  await FirebaseAuth.instance.signOut();
+
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginForm()),
+                    (Route<dynamic> route) => false,
+                  );
+                }
               },
             ),
           ],

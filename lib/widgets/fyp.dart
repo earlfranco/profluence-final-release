@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:social/views/getstory.dart';
 import 'package:social/views/photoview.dart';
 import 'package:social/views/profile.dart';
 import 'package:social/widgets/hashtag.dart';
@@ -9,15 +8,15 @@ import 'package:social/widgets/mediaplayer.dart';
 import 'package:social/widgets/morevert.dart';
 import 'package:social/widgets/viewcomments.dart';
 
-class UsersPostFeed extends StatefulWidget {
+class ForyouPage extends StatefulWidget {
   final Map<String, dynamic>? userData;
-  const UsersPostFeed({super.key, this.userData});
+  const ForyouPage({super.key, this.userData});
 
   @override
-  State<UsersPostFeed> createState() => _UsersPostFeedState();
+  State<ForyouPage> createState() => _ForyouPageState();
 }
 
-class _UsersPostFeedState extends State<UsersPostFeed> {
+class _ForyouPageState extends State<ForyouPage> {
   final String currentUserID = FirebaseAuth.instance.currentUser!.uid;
   List<DocumentSnapshot> userPosts = [];
   bool isReposting = false;
@@ -26,44 +25,27 @@ class _UsersPostFeedState extends State<UsersPostFeed> {
   bool isCommentOpen = false;
   String isPostComment = "";
   Map<String, int> postLikeCounts = {};
-
+  bool isFollowing = false;
+  bool isFriend = false; // This seems like a placeholder for future logic
   @override
   void initState() {
     super.initState();
-    _fetchLikedPosts(); // Fetch liked posts on init
+    _fetchLikedPosts();
   }
 
-  Stream<List<DocumentSnapshot>> _fetchFollowedUsersPosts() {
-    return FirebaseFirestore.instance
-        .collection('follows')
-        .doc(currentUserID)
-        .collection('following')
-        .snapshots()
-        .asyncMap((followingSnapshot) async {
-      List<String> followedUserIDs =
-          followingSnapshot.docs.map((doc) => doc.id).toList();
+  Stream<List<DocumentSnapshot>> _fetchFollowedUsersPosts() async* {
+    List<DocumentSnapshot> allUserPosts = [];
+    followedUserData = [];
+    try {
+      QuerySnapshot postSnapshot =
+          await FirebaseFirestore.instance.collectionGroup('posts').get();
 
-      List<DocumentSnapshot> allUserPosts = [];
-      followedUserData = [];
+      allUserPosts.addAll(postSnapshot.docs);
 
-      for (String followedUserID in followedUserIDs) {
-        QuerySnapshot postSnapshot = await FirebaseFirestore.instance
-            .collection('userpost')
-            .doc(followedUserID)
-            .collection('posts')
-            .get();
-
-        DocumentSnapshot followedUserDataDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(followedUserID)
-            .get();
-
-        allUserPosts.addAll(postSnapshot.docs);
-        followedUserData
-            .add(followedUserDataDoc.data() as Map<String, dynamic>);
-      }
-      return allUserPosts;
-    });
+      yield allUserPosts;
+    } catch (e) {
+      yield [];
+    }
   }
 
   Future<void> _fetchLikedPosts() async {
@@ -86,6 +68,61 @@ class _UsersPostFeedState extends State<UsersPostFeed> {
     } catch (e) {
       debugPrint('Error fetching liked posts: $e');
     }
+  }
+
+  Future<void> unfollow(String followingID) async {
+    DocumentReference followRef = FirebaseFirestore.instance
+        .collection('follows')
+        .doc(currentUserID)
+        .collection('following')
+        .doc(followingID);
+
+    await followRef.delete();
+    setState(() {
+      _isFollowingUser(followingID);
+    });
+  }
+
+  Future<void> following(String followingID) async {
+    DocumentReference followRef = FirebaseFirestore.instance
+        .collection('follows')
+        .doc(currentUserID)
+        .collection('following')
+        .doc(followingID);
+
+    await followRef.set(
+        {'timestamp': FieldValue.serverTimestamp(), 'userID': followingID});
+    await FirebaseFirestore.instance
+        .collection('follows')
+        .doc(followingID)
+        .collection('followers')
+        .add({
+      'timestamp': FieldValue.serverTimestamp(),
+      'userID': currentUserID
+    });
+
+    await FirebaseFirestore.instance
+        .collection('notification')
+        .doc(followingID)
+        .collection('notif')
+        .add({
+      'timestamp': FieldValue.serverTimestamp(),
+      'userID': currentUserID
+    });
+    setState(() {
+      _isFollowingUser(followingID);
+    });
+  }
+
+  Future<bool> _isFollowingUser(String userIdToCheck) async {
+    DocumentSnapshot doc = await FirebaseFirestore.instance
+        .collection('follows')
+        .doc(currentUserID)
+        .collection('following')
+        .doc(userIdToCheck)
+        .get();
+
+    return doc.exists;
   }
 
   Future<void> userPostLiked(String postId) async {
@@ -121,7 +158,6 @@ class _UsersPostFeedState extends State<UsersPostFeed> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const GetFollowingStory(),
           StreamBuilder<List<DocumentSnapshot>>(
             stream: _fetchFollowedUsersPosts(),
             builder: (context, snapshot) {
@@ -183,8 +219,50 @@ class _UsersPostFeedState extends State<UsersPostFeed> {
                                           Text("${userData['name']}"),
                                         ],
                                       ),
-                                      morevertOption(postData['userID'],
-                                          context, postData, postID)
+                                      FutureBuilder<bool>(
+                                        future: _isFollowingUser(
+                                            postData['userID']),
+                                        builder: (context, followSnapshot) {
+                                          if (!followSnapshot.hasData) {
+                                            return const CircularProgressIndicator(); // Show loading while checking
+                                          }
+
+                                          bool isFollowing =
+                                              followSnapshot.data!;
+
+                                          return TextButton(
+                                            onPressed: () {
+                                              if (isFollowing) {
+                                                unfollow(postData['userID']);
+                                              } else {
+                                                following(postData['userID']);
+                                              }
+                                            },
+                                            child: postData['userID'] !=
+                                                    currentUserID
+                                                ? isFollowing == false
+                                                    ? Text(
+                                                        postData['userID'] !=
+                                                                currentUserID
+                                                            ? isFollowing
+                                                                ? "Following"
+                                                                : "Follow"
+                                                            : "",
+                                                        style: TextStyle(
+                                                          color: isFollowing
+                                                              ? Colors.grey
+                                                              : Colors.blue,
+                                                        ),
+                                                      )
+                                                    : morevertOption(
+                                                        postData['userID'],
+                                                        context,
+                                                        postData,
+                                                        postID)
+                                                : Container(),
+                                          );
+                                        },
+                                      ),
                                     ],
                                   );
                                 }
@@ -264,11 +342,12 @@ class _UsersPostFeedState extends State<UsersPostFeed> {
                                 ? IconButton(
                                     onPressed: () {
                                       repostBtn(
-                                          '${postData['description']}',
-                                          '${postData['imageUrl']}',
-                                          'post',
-                                          '${postData['userID']}',
-                                          '${postData['mediaType']}');
+                                        '${postData['description']}',
+                                        '${postData['imageUrl']}',
+                                        'post',
+                                        '${postData['userID']}',
+                                        '${postData['mediaType']}',
+                                      );
                                     },
                                     icon: const Icon(Icons.autorenew_outlined))
                                 : const SizedBox(

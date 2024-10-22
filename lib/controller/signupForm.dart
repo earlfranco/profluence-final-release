@@ -301,7 +301,7 @@ class _SignUpFormState extends State<SignUpForm> {
             'name': _nameController.text,
             'email': _emailController.text,
             'schoolId': _schoolIdController.text,
-            'valid': 1,
+            'isvalid': 1,
             'isonline': 0,
             'profileImage': imageUrl,
             'userid': user.uid,

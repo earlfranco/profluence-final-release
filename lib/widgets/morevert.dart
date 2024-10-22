@@ -17,12 +17,19 @@ Widget morevertOption(String id, BuildContext context,
           case 2:
             reportOption(Navigator.of(context).context, postData);
             break;
+          case 3:
+            deletepost(Navigator.of(context).context, postID);
+            break;
         }
       },
       itemBuilder: (context) => [
         const PopupMenuItem(
           value: 1,
           child: Text("Edit"),
+        ),
+        const PopupMenuItem(
+          value: 3,
+          child: Text("Delete"),
         ),
         const PopupMenuItem(
           value: 2,
@@ -171,6 +178,22 @@ Future<void> updatePost(
   );
 }
 
+Future<void> deletepost(BuildContext context, String postId) async {
+  final currentuser = FirebaseAuth.instance.currentUser;
+  try {
+    await FirebaseFirestore.instance
+        .collection('userpost')
+        .doc(currentuser!.uid)
+        .collection('posts')
+        .doc(postId)
+        .delete();
+    await modalMessage("Post Deleted", Navigator.of(context).context, "Delete");
+  } catch (error) {
+    await modalMessage("Error, please try again later.",
+        Navigator.of(context).context, "Delete Failed");
+  }
+}
+
 Future<void> editpost(
     BuildContext context, String postId, String description) async {
   final currentuser = FirebaseAuth.instance.currentUser;
@@ -194,9 +217,14 @@ Future<void> editpost(
 Future<void> submitReport(
     BuildContext context, Map<String, dynamic> postData, String report) async {
   try {
-    await FirebaseFirestore.instance.collection('reports').add({
+    await FirebaseFirestore.instance
+        .collection('reports')
+        .doc(postData['userID'])
+        .collection('report')
+        .add({
       'userID': postData['userID'],
       'reporttitle': report,
+      'reportcreated': Timestamp.now()
     });
     await modalMessage("$report has been submitted",
         Navigator.of(context).context, "Report Submitted");

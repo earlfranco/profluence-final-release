@@ -3,10 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:social/controller/searchuser.dart';
-import 'package:social/widgets/userpost.dart';
-
+import 'package:social/widgets/fyp.dart';
 import 'package:social/widgets/homeapp.dart';
 import 'package:social/widgets/nav.dart';
+import 'package:social/widgets/userpost.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -50,43 +50,55 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: const DrawerFb1(),
-      appBar: AppBar(
-        titleSpacing: 2,
-        title: Text(
-          "Profluence",
-          style: GoogleFonts.dancingScript(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 35),
-        ),
-        actions: [
-          HomeAppBar(userData: userData),
-          IconButton(
+    return DefaultTabController(
+      length: 2, // Number of tabs
+      child: Scaffold(
+        drawer: const DrawerFb1(),
+        appBar: AppBar(
+          titleSpacing: 2,
+          title: Text(
+            "Profluence",
+            style: GoogleFonts.dancingScript(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 35,
+            ),
+          ),
+          actions: [
+            HomeAppBar(userData: userData),
+            IconButton(
               onPressed: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SearchuserForm()));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SearchuserForm(),
+                  ),
+                );
               },
-              icon: const Icon(Icons.search)),
-        ],
-      ),
-      body: userData != null
-          ? RefreshIndicator(
-              onRefresh: () async {
-                setState(() {});
-              },
-              child: SingleChildScrollView(
-                child: Column(
+              icon: const Icon(Icons.search),
+            ),
+          ],
+          bottom: const TabBar(
+            tabs: [
+              Tab(text: 'For you'),
+              Tab(text: 'Following'),
+            ],
+          ),
+        ),
+        body: userData != null
+            ? RefreshIndicator(
+                onRefresh: () async {
+                  setState(() {}); // Trigger refresh
+                },
+                child: const TabBarView(
                   children: [
-                    UsersPostFeed(
-                      userData: userData,
-                    )
+                    ForyouPage(),
+                    UsersPostFeed(),
                   ],
                 ),
-              ),
-            )
-          : const LinearProgressIndicator(),
+              )
+            : const LinearProgressIndicator(),
+      ),
     );
   }
 }
