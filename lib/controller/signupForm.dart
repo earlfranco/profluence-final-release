@@ -240,7 +240,7 @@ class _SignUpFormState extends State<SignUpForm> {
                                             const LoginForm()));
                               },
                               child: const PrimaryText(
-                                data: "Aleary have an account? Login",
+                                data: "Already have an account? Login",
                                 fcolor: secondColor,
                               ))
                         ],
