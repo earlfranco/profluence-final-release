@@ -77,6 +77,10 @@ By using Profluence, you agree to these terms. If you do not agree with any part
 For any questions or concerns regarding these terms, please contact Profluence support.
 
 Thank you for being a part of the Profluence community!
+
+Version 1.1
+by the Comp19
+The ProFluence Team
                   ''',
                   style: TextStyle(fontSize: 16),
                 ),
